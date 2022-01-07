@@ -6,46 +6,61 @@ export const Slide = () => {
   const SlidReference = useRef({} as HTMLDivElement);
   const PositionSlideReference = useRef(0);
   const QuantitieElements = useRef(0);
+  const CurrentSlideIsShowing = useRef(0);
 
   const Preview = () => {
 
-    if(PositionSlideReference.current == 0){
+    if (PositionSlideReference.current == 0) {
 
       SlidReference.current.scrollTo((PositionSlideReference.current = QuantitieElements.current * 600), 0);
+      CurrentSlideIsShowing.current = QuantitieElements.current;
+
       return;
-    
+
     }
 
     SlidReference.current.scrollTo((PositionSlideReference.current -= 600), 0);
+    CurrentSlideIsShowing.current = 0;
 
   }
 
-  const Next = (initTimer: boolean) => {
+  const Next = () => {
 
-    if(PositionSlideReference.current + 600 >= (QuantitieElements.current * 600)){
+    if (PositionSlideReference.current + 600 >= (QuantitieElements.current * 600)) {
 
       SlidReference.current.scrollTo((PositionSlideReference.current = 0), 0);
+      CurrentSlideIsShowing.current = 1;
 
     } else {
 
-      SlidReference.current.scrollTo((initTimer ? 0 : PositionSlideReference.current += 600), 0);
+      SlidReference.current.scrollTo((PositionSlideReference.current += 600), 0);
+      CurrentSlideIsShowing.current++;
 
     }
-
-    setTimeout(() => {
-      Next(false);
-    }, 3000);
 
   }
 
   useEffect(() => {
 
-    QuantitieElements.current = document.querySelectorAll('[data-slide]').length;
-    Next(true);
+    if (!QuantitieElements.current) {
+
+      QuantitieElements.current = document.querySelectorAll('[data-slide]').length;
+
+    }
+
+    CurrentSlideIsShowing.current = 2;
+
+    setInterval(() => {
+
+      console.log(CurrentSlideIsShowing.current);
+
+      Next();
+
+    }, 3000);
 
   }, []);
 
-  return(
+  return (
     <ContainerSlide>
       <button onClick={() => Preview()}>Preview</button>
       <div ref={SlidReference} className='Containerfather'>
@@ -71,7 +86,7 @@ export const Slide = () => {
           <h1>Container [Slide] - 7</h1>
         </div>
       </div>
-      <button onClick={() => Next(false)}>Next</button>
+      <button onClick={() => Next()}>Next</button>
     </ContainerSlide>
   );
 }
